@@ -410,3 +410,33 @@ udat_setCalendar(UDateFormat *format,
     if (api != NULL)
         api->udat_set_calendar_fn(format, calendar);
 }
+
+void
+ucal_setMillis(UCalendar *calendar,
+               UDate date,
+               UErrorCode *status)
+{
+    IcuBridgeApi *api = get_bridge();
+    if (api == NULL)
+    {
+        set_missing(status);
+        return;
+    }
+    api->ucal_set_millis(calendar, date, status);
+}
+
+
+int32_t
+ucal_get(const UCalendar *calendar,
+         UCalendarDateFields field,
+         UErrorCode *status)
+{
+    IcuBridgeApi *api = get_bridge();
+    if (api == NULL)
+    {
+        set_missing(status);
+        return 0;
+    }
+    return api->ucal_get_fn(calendar, field, status);
+}
+

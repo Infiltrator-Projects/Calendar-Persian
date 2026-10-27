@@ -196,12 +196,9 @@ pattern_for_part(CalendarCalendarMode mode,
 }
 
 gchar *
-calendar_icu_format(CalendarCalendarMode format_profile,
-                         const gchar *calendar_keyword,
-                         gint64 jdn,
-                         CalendarDatePart part)
+calendar_icu_format_pattern(const gchar *calendar_keyword,
+                            gint64 jdn, const gchar *pattern)
 {
-    (void)format_profile;
     UErrorCode status = U_ZERO_ERROR;
     gchar locale[ULOC_FULLNAME_CAPACITY];
     UChar pattern_utf16[128];
@@ -213,7 +210,6 @@ calendar_icu_format(CalendarCalendarMode format_profile,
     gint32 capacity = G_N_ELEMENTS(stack_buffer);
     gint32 length;
     gchar *result;
-    const gchar *pattern = pattern_for_part(format_profile, part);
     UDate utc_noon;
 
     if (!jdn_to_udate(jdn, &utc_noon)) return g_strdup("");
@@ -295,4 +291,50 @@ calendar_icu_format(CalendarCalendarMode format_profile,
     return result;
 }
 
+
+
+/* A private pattern adapter also lets native chronology supply date parts
+ * without delegating its leap-year policy to an older ICU installation. */
+gchar *
+calendar_icu_format(CalendarCalendarMode format_profile,
+                    const gchar *calendar_keyword, gint64 jdn,
+                    CalendarDatePart part)
+{
+    return calendar_icu_format_pattern(calendar_keyword, jdn,
+                                      pattern_for_part(format_profile, part));
+}
+
+gboolean
+calendar_icu_fields_from_jdn(
+    const gchar *calendar_keyword,
+    gint64 jdn,
+    CalendarCalendarFields *fields)
+{
+    UErrorCode status = U_ZERO_ERROR;
+    UCalendar *calendar;
+    UDate utc_noon;
+    CalendarCalendarFields converted = {0};
+
+    g_return_val_if_fail(fields != NULL, FALSE);
+    if (!jdn_to_udate(jdn, &utc_noon)) return FALSE;
+
+    calendar = open_icu_calendar(calendar_keyword, &status);
+    if (U_FAILURE(status) || calendar == NULL)
+        return FALSE;
+
+    ucal_setMillis(calendar, utc_noon, &status);
+    if (U_SUCCESS(status))
+    {
+        converted.year = ucal_get(calendar, UCAL_YEAR, &status);
+        converted.month = ucal_get(calendar, UCAL_MONTH, &status) + 1;
+        converted.day = ucal_get(calendar, UCAL_DATE, &status);
+        converted.auxiliary = ucal_get(calendar, UCAL_ERA, &status);
+        converted.special =
+            ucal_get(calendar, UCAL_IS_LEAP_MONTH, &status) != 0;
+    }
+    ucal_close(calendar);
+    if (U_FAILURE(status)) return FALSE;
+    *fields = converted;
+    return TRUE;
+}
 

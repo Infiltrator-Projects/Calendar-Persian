@@ -69,8 +69,61 @@ provider_format(const InfiltratrTemporalCalendarProvider *provider,
     InfiltratrTemporalCalendarFields checked;
     if (!provider_fields(provider, jdn, &checked))
         return false;
-    return resource_format_icu(
-        CALENDAR_CALENDAR_MODE_PERSIAN, "persian", jdn, part, buffer, capacity, length);
+    if (buffer == NULL || capacity == 0U || length == NULL ||
+        part < INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_DAY ||
+        part > INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_FULL)
+        return false;
+
+    CalendarCalendarFields host;
+    if (!calendar_icu_fields_from_jdn("persian", jdn, &host))
+        return false;
+    if (host.year == checked.year && host.month == checked.month &&
+        host.day == checked.day)
+        return resource_format_icu(
+            CALENDAR_CALENDAR_MODE_PERSIAN, "persian", jdn,
+            part, buffer, capacity, length);
+
+    /* Native chronology includes ICU's later Persian leap corrections.
+     * Older ICU (including 74) can disagree by a day. Ask it for localized
+     * names/numerals at stable representative dates, rather than displaying
+     * its conflicting date for this JDN. Keep the weekday at the real JDN. */
+    const int64_t day_sample = calendar_arithmetic_persian_fields_to_jdn(
+        1400, 1, checked.day);
+    const int64_t month_sample = calendar_arithmetic_persian_fields_to_jdn(
+        1400, checked.month, 1);
+    const int64_t year_sample = calendar_arithmetic_persian_fields_to_jdn(
+        checked.year, 2, 10);
+    gchar *day = calendar_icu_format_pattern("persian", day_sample, "d");
+    gchar *month = calendar_icu_format_pattern("persian", month_sample,
+        part == INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_MONTH ? "LLLL" : "MMMM");
+    gchar *year = calendar_icu_format_pattern("persian", year_sample, "y");
+    gchar *weekday = calendar_icu_format_pattern("persian", jdn, "EEEE");
+    gchar *text = NULL;
+    bool success = false;
+
+    if (day != NULL && *day != '\0' && month != NULL && *month != '\0' &&
+        year != NULL && *year != '\0' && weekday != NULL && *weekday != '\0') {
+        switch (part) {
+        case INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_DAY:
+            text = g_strdup(day); break;
+        case INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_MONTH:
+            text = g_strdup(month); break;
+        case INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_YEAR:
+            text = g_strdup(year); break;
+        case INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_SHORT:
+            text = g_strdup_printf("%s %s %s", day, month, year); break;
+        case INFILTRATR_TEMPORAL_CALENDAR_DATE_PART_FULL:
+            text = g_strdup_printf("%s, %s %s %s", weekday, day, month, year); break;
+        default: break;
+        }
+        if (text != NULL && strlen(text) < capacity) {
+            *length = strlen(text);
+            memcpy(buffer, text, *length + 1U);
+            success = true;
+        }
+    }
+    g_free(day); g_free(month); g_free(year); g_free(weekday); g_free(text);
+    return success;
 }
 
 static bool
