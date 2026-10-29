@@ -1,0 +1,77 @@
+{
+  "title": "Persian Solar Hijri Calendar",
+  "intro": "The Solar Hijri calendar is a solar calendar used for civil dates in Iran and related traditions. Its new year, Nowruz, begins close to the northern spring equinox. Unlike a lunar calendar, its months remain linked to the seasons.",
+  "summary": "Twelve months. The first six contain 31 days, the next five contain 30, and the final month usually has 29 (or 30 in a leap year).",
+  "origin": "The modern civil Solar Hijri system took shape in the twentieth century. This implementation follows the project’s documented ICU-compatible leap corrections, not every older Iranian date convention.",
+  "ring_label": "12",
+  "diagram_title": "THE SOLAR YEAR",
+  "structure": "A long summer half and a shorter winter half make the year easy to remember. Leap years add a day to the final month, Esfand.",
+  "diagram_caption": "SIX LONG MONTHS  /  FIVE MEDIUM  /  ONE VARIABLE",
+  "sections": [
+    {
+      "name": "Farvardin",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Ordibehesht",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Khordad",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Tir",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Mordad",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Shahrivar",
+      "days": "31",
+      "special": false
+    },
+    {
+      "name": "Mehr",
+      "days": "30",
+      "special": false
+    },
+    {
+      "name": "Aban",
+      "days": "30",
+      "special": false
+    },
+    {
+      "name": "Azar",
+      "days": "30",
+      "special": false
+    },
+    {
+      "name": "Dey",
+      "days": "30",
+      "special": false
+    },
+    {
+      "name": "Bahman",
+      "days": "30",
+      "special": false
+    },
+    {
+      "name": "Esfand",
+      "days": "29/30",
+      "special": true
+    }
+  ],
+  "pattern_note": "Months are not tied to sightings of the Moon. The calendar's leap-year calculation keeps the new year near the seasonal spring boundary.",
+  "history": "Nowruz has a long cultural history. Modern Solar Hijri civil month lengths and computation were standardised far later. The official calendars of different countries and centuries should not be treated as automatically identical.",
+  "example": "Nowruz is the first day of Farvardin, usually falling around 20 or 21 March in Gregorian notation. The exact match depends on the particular year and calendar rule.",
+  "limits": "The implemented arithmetic is not a reconstruction of historical Iranian month lengths before 1304 AP (1925 CE), nor a blanket guarantee of every equinox-based civil decision.",
+  "source": "https://github.com/Infiltrator-Projects/Calendar-Persian"
+}
