@@ -313,7 +313,7 @@ calendar_icu_fields_from_jdn(
     UErrorCode status = U_ZERO_ERROR;
     UCalendar *calendar;
     UDate utc_noon;
-    CalendarCalendarFields converted = {0};
+    CalendarCalendarFields converted{};
 
     g_return_val_if_fail(fields != NULL, FALSE);
     if (!jdn_to_udate(jdn, &utc_noon)) return FALSE;
