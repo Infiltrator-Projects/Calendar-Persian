@@ -1,63 +1,63 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Clock-specific logic stays local; Common owns generic code and ABI.
+# Native C++ chronology and stable C ABI; C helpers remain C. Shared build tools from Common.
 .DEFAULT_GOAL := all
-CC ?= cc
+CC ?= gcc
+CXX ?= g++
 PKG_CONFIG ?= pkg-config
-PYTHON ?= python3
 BUILD_DIR ?= build
 RESOURCE_NAME := Persian Solar Hijri Calendar
 COMMON_DIR := common
-COMMON_REVISION := dc4aac326964ca4400b6e21851d16eea674040c8
+COMMON_REVISION := 7499fb1c81d95a11a06224c9a33c19bb71bd996d
 COMMON_VERSION := 1.19.80
 COMMON_BUILD_DIR := $(abspath $(BUILD_DIR))/common
 COMMON_ARCHIVE := $(COMMON_BUILD_DIR)/libinfiltratr-common.a
 DEPENDENCIES := glib-2.0 icu-i18n
-SOURCES := $(shell find src -type f -name '*.c' | LC_ALL=C sort)
+C_SOURCES := $(shell find src -type f -name '*.c' | LC_ALL=C sort)
+CXX_SOURCES := $(shell find src -type f -name '*.cpp' | LC_ALL=C sort)
+C_OBJECTS := $(patsubst src/%.c,$(BUILD_DIR)/obj/%.o,$(C_SOURCES))
+CXX_OBJECTS := $(patsubst src/%.cpp,$(BUILD_DIR)/obj/%.o,$(CXX_SOURCES))
 TARGET := $(BUILD_DIR)/$(RESOURCE_NAME).so
-ifneq ($(strip $(DEPENDENCIES)),)
 DEP_CFLAGS := $(shell $(PKG_CONFIG) --cflags $(DEPENDENCIES))
-endif
-ifneq ($(filter glib-2.0,$(DEPENDENCIES)),)
 DEP_LIBS := $(shell $(PKG_CONFIG) --libs glib-2.0)
-endif
-CPPFLAGS += -I$(COMMON_DIR)/include -Iinclude -Isrc -Isrc/support -Isrc/calendars -Isrc/calendars/engine -Isrc/clocks \
-    -include include/provider-config.h -DGETTEXT_PACKAGE=\"infiltrator-calendar-persian\" \
+CPPFLAGS += -I$(COMMON_DIR)/include -Iinclude -Isrc -Isrc/support -Isrc/calendars -Isrc/calendars/engine \
+    -include include/provider-config.h -DGETTEXT_PACKAGE=\"infiltrator-temporal-resources\" \
     -DU_DISABLE_RENAMING=1 -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_74 \
     -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_74
 CFLAGS ?= -O2 -g
 CFLAGS += -std=c11 -fPIC -fvisibility=hidden -ffunction-sections -fdata-sections \
     -Wall -Wextra -Wpedantic -Werror -Wformat=2 -Wshadow -Wstrict-prototypes \
-    -Wmissing-prototypes -fstack-protector-strong -fno-common \
-    -ffile-prefix-map=$(CURDIR)=. -fdebug-prefix-map=$(CURDIR)=.
+    -Wmissing-prototypes -fstack-protector-strong -fno-common
+CXXFLAGS += $(filter-out -std=c11 -Wstrict-prototypes -Wmissing-prototypes,$(CFLAGS)) -std=c++20
 LDLIBS += $(DEP_LIBS) -lm -ldl -pthread
-.PHONY: common-check
+.PHONY: common-check all check audit-authorities clean release deb native-deb
 common-check:
-	@if test ! -f common/VERSION; then git submodule update --init --depth 1 -- common; fi
-	@grep -qx "$(COMMON_VERSION)" common/VERSION
-	@if test -e common/.git; then git -C common rev-parse HEAD | grep -qx "$(COMMON_REVISION)"; fi
-	@test ! -d include/infiltratr || { echo "Copied Common headers forbidden" >&2; exit 1; }
-	@test ! -f src/arithmetic.c -a ! -f src/core.c -a ! -f src/dynlib.c -a ! -f src/temporal.c || { echo "Private Common sources forbidden" >&2; exit 1; }
+	@test -f "$(COMMON_DIR)/VERSION" || { echo "Missing Common submodule"; exit 1; }
+	@grep -qx "$(COMMON_VERSION)" "$(COMMON_DIR)/VERSION" || exit 1
+	@if test -e "$(COMMON_DIR)/.git"; then git -C "$(COMMON_DIR)" rev-parse HEAD | grep -qx "$(COMMON_REVISION)" || exit 1; fi
+	@test ! -d include/infiltratr || { echo "Copied Common headers forbidden"; exit 1; }
 $(COMMON_ARCHIVE): common-check
 	@mkdir -p "$(COMMON_BUILD_DIR)"
-	$(MAKE) -C common CC="$(CC)" BUILD_DIR="$(COMMON_BUILD_DIR)" CFLAGS="$(CFLAGS) -Wno-missing-profile" all
-.PHONY: all check audit-authorities clean
-all: $(COMMON_ARCHIVE)
+	$(MAKE) -C "$(COMMON_DIR)" CC="$(CC)" BUILD_DIR="$(COMMON_BUILD_DIR)" CFLAGS="$(CFLAGS) -Wno-missing-profile" all
+$(BUILD_DIR)/obj/%.o: src/%.c
+	@mkdir -p "$(@D)"
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEP_CFLAGS) -c "$<" -o "$@"
+$(BUILD_DIR)/obj/%.o: src/%.cpp
+	@mkdir -p "$(@D)"
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEP_CFLAGS) -c "$<" -o "$@"
+all: $(COMMON_ARCHIVE) $(C_OBJECTS) $(CXX_OBJECTS)
 	@mkdir -p "$(BUILD_DIR)"
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(DEP_CFLAGS) -shared $(SOURCES) $(COMMON_ARCHIVE) \
+	$(CXX) -shared $(C_OBJECTS) $(CXX_OBJECTS) $(COMMON_ARCHIVE) \
 	    -Wl,--version-script=exports.map -Wl,-z,defs -Wl,--gc-sections \
 	    $(LDFLAGS) -o "$(TARGET)" $(LDLIBS)
 check: all
-	$(PYTHON) tests/check_provider.py "$(TARGET)"
-	LANGUAGE=en_US LC_ALL=C.UTF-8 $(PYTHON) tests/check_accuracy.py "$(TARGET)"
+	bash common/calendar-tools/check.sh "$(TARGET)"
 audit-authorities: all
-	LANGUAGE=en_US LC_ALL=C.UTF-8 $(PYTHON) tests/check_accuracy.py "$(TARGET)" --authorities
+	bash common/calendar-tools/check.sh "$(TARGET)" --authorities
 clean:
 	rm -rf "$(BUILD_DIR)"
-
-.PHONY: release deb native-deb
 release:
-	$(PYTHON) packaging/release.py release
+	bash common/calendar-tools/build.sh release
 deb:
-	$(PYTHON) packaging/release.py deb --profile portable
+	bash common/calendar-tools/build.sh deb --profile portable
 native-deb:
-	$(PYTHON) packaging/release.py deb --profile aggressive
+	bash common/calendar-tools/build.sh deb --profile aggressive

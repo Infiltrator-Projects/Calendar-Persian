@@ -41,7 +41,7 @@ provider_fields(const InfiltratrTemporalCalendarProvider *provider,
             native_fields.year, native_fields.month, native_fields.day) != jdn)
         return false;
 
-    *fields = (InfiltratrTemporalCalendarFields){
+    *fields = InfiltratrTemporalCalendarFields{
         .year = native_fields.year,
         .month = native_fields.month,
         .day = native_fields.day,
@@ -221,18 +221,18 @@ static const InfiltratrTemporalCalendarProvider persian_provider = {
     .add_years = provider_add_years
 };
 
-CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalResourceMetadata *
+extern "C" CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalResourceMetadata *
 infiltratr_temporal_resource_metadata_v1(void);
-CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalCalendarProvider *
+extern "C" CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalCalendarProvider *
 infiltratr_temporal_calendar_provider_v1(void);
 
-CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalResourceMetadata *
+extern "C" CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalResourceMetadata *
 infiltratr_temporal_resource_metadata_v1(void)
 {
     return &persian_metadata;
 }
 
-CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalCalendarProvider *
+extern "C" CALENDAR_RESOURCE_EXPORT const InfiltratrTemporalCalendarProvider *
 infiltratr_temporal_calendar_provider_v1(void)
 {
     return &persian_provider;
