@@ -46,7 +46,7 @@ provider_fields(const InfiltratrTemporalCalendarProvider *provider,
         .month = native_fields.month,
         .day = native_fields.day,
         .auxiliary = native_fields.auxiliary,
-        .special = native_fields.special
+        .special = (native_fields.special != FALSE)
     };
     return true;
 }
