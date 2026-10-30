@@ -138,7 +138,7 @@ utf16_to_utf8(const UChar *source,
         return g_strdup("");
     }
 
-    result = g_malloc(capacity);
+    result = static_cast<gchar *>(g_malloc(capacity));
     u_strToUTF8(result,
                 (gint32)capacity,
                 NULL,
@@ -274,7 +274,7 @@ calendar_icu_format_pattern(const gchar *calendar_keyword,
         }
 
         capacity = (gint32)element_count;
-        output = g_malloc(allocation_bytes);
+        output = static_cast<UChar *>(g_malloc(allocation_bytes));
         length = udat_format(formatter,
                              utc_noon,
                              output,
