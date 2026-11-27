@@ -1,6 +1,6 @@
 # Persian Solar Hijri Calendar — source copy record
 
-This repository now contains its own implementation of provider `persian`, its required supporting C code and headers, a one-provider build, and copy-regression fixtures.
+The initial source extraction created an independent implementation of provider `persian`, its required supporting C code and headers, a one-provider build, and copy-regression fixtures.
 
 ## Origin and scope
 
@@ -12,7 +12,7 @@ This repository now contains its own implementation of provider `persian`, its r
 - **Native resource path:** `/System/Resources/Calendars/Persian Solar Hijri Calendar.so`.
 - **Original Common code:** retained unchanged. The original extraction was a copy, not a removal. Independent packaging now transfers only this installed module through dpkg; Common source remains retained.
 
-Combined source files were selected for this provider and split by keeping its existing operations, data and required helper definitions. Inactive provider branches and unreachable definitions were removed. Shared arithmetic, formatting, localization and runtime-bridge helpers are intentionally copied into every repository that needs them. The local build uses only this repository's source and platform dependencies; it does not fetch or link a Common checkout/archive.
+Combined source files were selected for this provider and split by keeping its existing operations, data and required helper definitions. Inactive provider branches and unreachable definitions were removed. Shared helpers were copied during the initial extraction. Current builds instead compile and link the exact Common 1.19.87 submodule; copied Common headers are forbidden.
 
 Public Common ABI headers retain compatibility declarations. Those declarations do not install or implement the other providers. The built module exports only its metadata entry and its `calendar` operation-table entry. Existing notices and the original GPL license are retained.
 
@@ -20,16 +20,16 @@ Public Common ABI headers retain compatibility declarations. Those declarations 
 
 ## Build and check
 
-Use a C11 compiler, GNU Make, Python 3 and pkg-config. Development packages required by this copy: glib-2.0, icu-i18n.
+Use C11 and C++20 compilers, GNU Make and pkg-config, with glib-2.0 and icu-i18n development packages. Initialise the pinned Common submodule before building.
 
 ```sh
 make
 make check
 ```
 
-The build directly creates `build/Persian Solar Hijri Calendar.so`. ICU-backed providers retain the copied runtime ABI bridge and use the host's ICU/CLDR data. Independent release and installation tools are now copied into this repository; see `docs/PACKAGING.md`.
+The build directly creates `build/Persian Solar Hijri Calendar.so`. The current provider uses ICU/CLDR data and the Common build and validation tools; see `docs/PACKAGING.md`.
 
-## Recorded checks
+## Historical extraction checks
 
 - Independent build with strict C11 warnings treated as errors.
 - Metadata, stable ID, canonical name, callback ABI and export checks.

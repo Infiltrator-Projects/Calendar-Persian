@@ -3,6 +3,8 @@
 This repository contains source for exactly one `calendar` provider, stable ID `persian`. The Common original is retained.
 
 - [Overview](../README.md) — identity, model, current status and source links.
+- [User manual source](GUIDE.json) — calendar structure, history, examples and limitations.
+- [Packaging](PACKAGING.md) — current release and installed-file contract.
 - [Model](MODEL.md) — maintained interpretation and fidelity boundaries.
 - [Architecture](ARCHITECTURE.md) — local source, helpers and native ABI.
 - [Validation](VALIDATION.md) — completed copy checks and remaining qualification.
