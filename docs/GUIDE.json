@@ -1,12 +1,7 @@
 {
   "title": "Persian Solar Hijri Calendar",
   "intro": "The Solar Hijri calendar is a solar calendar used for civil dates in Iran and related traditions. Nowruz, the first day of its year, falls close to the northern spring equinox.",
-  "summary": "Twelve months form a common year of 365 days or a leap year of 366 days.",
-  "origin": "Modern civil Solar Hijri month lengths were standardised in the twentieth century. Nowruz itself has a much longer cultural history.",
-  "ring_label": "12",
-  "diagram_title": "THE SOLAR YEAR",
-  "structure": "The first six months contain 31 days, the next five contain 30 days, and Esfand contains 29 days in a common year or 30 in a leap year.",
-  "diagram_caption": "SIX LONG MONTHS  /  FIVE MEDIUM  /  ONE VARIABLE",
+  "structure": "Twelve months form a common year of 365 days or a leap year of 366 days. The first six months contain 31 days, the next five contain 30 days, and Esfand contains 29 days in a common year or 30 in a leap year.",
   "sections": [
     {
       "name": "Farvardin",
@@ -69,9 +64,12 @@
       "special": true
     }
   ],
-  "pattern_note": "Months are not determined by lunar sightings. This provider uses the maintained ICU-compatible arithmetic leap corrections to keep the year near the seasonal spring boundary.",
-  "history": "Official calendar conventions have varied across countries and historical periods; the modern month structure cannot be assumed to apply to older Persian dates.",
   "example": "1 Farvardin usually corresponds to 20 or 21 March in Gregorian notation; the exact correspondence depends on the year and calendar rule.",
+  "history": "Modern civil Solar Hijri month lengths were standardised in the twentieth century. Nowruz has a much longer cultural history. Official conventions have varied across countries and historical periods; the modern month structure cannot be assumed to apply to older Persian dates.",
+  "model": "The provider uses the maintained ICU-compatible arithmetic leap corrections to keep the year near the seasonal spring boundary; months are not determined by lunar sightings.",
   "limits": "The implemented arithmetic is not a reconstruction of historical Iranian month lengths before 1304 AP (1925 CE), nor a blanket guarantee of every equinox-based civil decision.",
-  "source": "https://github.com/Infiltrator-Projects/Calendar-Persian"
+  "sources": [
+    "https://github.com/Infiltrator-Projects/Calendar-Persian",
+    "Model evidence: https://github.com/Infiltrator-Projects/Calendar-Persian/blob/main/docs/MODEL.md"
+  ]
 }
