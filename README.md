@@ -12,7 +12,7 @@ The provider owns fields, localized formatting, period starts and navigation. Fi
 
 ## Status
 
-**Independent source, native installation and releases.** This repository contains the implementation of `persian`, the supporting code it needs, a one-provider `Makefile` and focused regression fixtures. The initial extraction came from Common 1.19.78; current builds link the pinned Common 1.19.87 submodule. The original source remains available.
+**Independent source, native installation and releases.** This repository contains the implementation of `persian`, the supporting code it needs, a one-provider `Makefile` and focused regression fixtures. The initial extraction came from Common 1.19.78; current builds link the pinned Common 1.19.89 submodule. The original source remains available.
 
 Run `make` to produce `build/Persian Solar Hijri Calendar.so` and `make check` to run this provider's checks. Initialise the pinned Common submodule with `git submodule update --init --recursive` before building. Current releases provide a portable amd64 Debian package and a lightweight native network installer.
 
@@ -45,4 +45,4 @@ Run `make release` to qualify and create exactly two assets in `dist/`: a portab
 
 Run the downloaded `.run --profile aggressive` as an ordinary user. It provisions missing build prerequisites, compiles for the local CPU with `-O3`, LTO and measured two-pass PGO, checks the final module, then installs a native Debian package through sudo. InfiltratorOS invokes `--profile aggressive --system-package-mode` from its serialized installation worker. `--build-only --output DIRECTORY` qualifies a native package without installing it.
 
-Each package owns only this provider and its PDF manual under `/System/Resources/Documentation/`. `docs/GUIDE.json` is the structured manual source; the currently pinned Common renderer still uses the README summary and scope. Engineering documentation remains in the repository. Its `Replaces` declaration transfers this module from `infiltrator-calendar-resources` on existing machines; other modules and Common source remain intact. Native package versions use `+native1` so a same-version generic package does not replace a local optimized build. See [packaging details](docs/PACKAGING.md).
+Each package owns only this provider and its PDF manual under `/System/Resources/Documentation/`. `docs/GUIDE.json` is the structured manual source; the pinned Common renderer uses the complete structured guide. Engineering documentation remains in the repository. Its `Replaces` declaration transfers this module from `infiltrator-calendar-resources` on existing machines; other modules and Common source remain intact. Native package versions use `+native1` so a same-version generic package does not replace a local optimized build. See [packaging details](docs/PACKAGING.md).

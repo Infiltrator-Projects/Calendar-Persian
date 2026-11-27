@@ -12,7 +12,7 @@ The initial source extraction created an independent implementation of provider 
 - **Native resource path:** `/System/Resources/Calendars/Persian Solar Hijri Calendar.so`.
 - **Original Common code:** retained unchanged. The original extraction was a copy, not a removal. Independent packaging now transfers only this installed module through dpkg; Common source remains retained.
 
-Combined source files were selected for this provider and split by keeping its existing operations, data and required helper definitions. Inactive provider branches and unreachable definitions were removed. Shared helpers were copied during the initial extraction. Current builds instead compile and link the exact Common 1.19.87 submodule; copied Common headers are forbidden.
+Combined source files were selected for this provider and split by keeping its existing operations, data and required helper definitions. Inactive provider branches and unreachable definitions were removed. Shared helpers were copied during the initial extraction. Current builds instead compile and link the exact Common 1.19.89 submodule; copied Common headers are forbidden.
 
 Public Common ABI headers retain compatibility declarations. Those declarations do not install or implement the other providers. The built module exports only its metadata entry and its `calendar` operation-table entry. Existing notices and the original GPL license are retained.
 
